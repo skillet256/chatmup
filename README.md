@@ -12,3 +12,8 @@ to view the traffic flowing through the ax25 radio port
 Or, use ax25spy -bt
 
 You can use multiple digis separated by space to widen the chat network
+
+This is a bash script that runs on Linux.
+
+Software package dependencies:
+ax25-tools libax25
