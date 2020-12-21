@@ -1,0 +1,85 @@
+#!/bin/bash
+#
+#KTD 1/15/12 This is ChatMUP: Chat Mode Unproto Packet.
+#
+#This app uses 'beacon' to send UI/unproto mode
+#mode packets in linux for use in unproto mode nets
+#or general CQ type chatting on packet radio.
+#
+#this program is useful if you use this in one tmux pane and
+#in another tmux pane run "sudo axlisten 0 -art"
+#to view the traffic flowing through the ax25 radio port
+#Or, use ax25spy -bt
+#KTD (KA5D) 9/30/20 complete rewrite of this app for better usability.
+
+# You can use multiple digis separated by space to widen the chat network
+
+#KTD 9/30/20 **********MODIFY THESE VARIABLES TO SUIT*********
+DEFAULT_PORT="0"
+DEFAULT_DEST="CQ"
+DEFAULT_DIGI="UT"
+#KTD 9/30/20 *************************************************
+
+clear
+echo "+---------------------------------------------------------------+"
+echo "| This is ChatMUP: Chat Mode Unproto Packet, by KA5D            |"
+echo "| Tip: use tmux and split the panes. Run chatmup in one pane.   |"
+echo "| Run: sudo axlisten [port] -art in another pane to see output. |"
+echo "+---------------------------------------------------------------+"
+echo
+echo -n "Enter ax25 port to use [default="$DEFAULT_PORT"]: "
+read PORT
+echo "Austin digis on 145.73: UT LEAKA CDRPRK RNDRCK ARESTC N9SEO-8"
+echo -n "Via what digi? Enter 1 for "$DEFAULT_DIGI", [default=<none>]: "
+read DIGI
+echo -n "What destination callsign? [default="$DEFAULT_DEST"]: "
+read DEST
+
+if [[ "$DEST"a = "a" ]] ; then
+  DEST=$DEFAULT_DEST
+fi
+
+if [[ "$DIGI"a = "a" ]] ; then
+  DESTINATION="$DEST"
+elif [[ "$DIGI" = "1" ]] ; then
+  DIGI=$DEFAULT_DIGI
+  DESTINATION="$DEST $DIGI"
+else
+  DESTINATION="$DEST $DIGI"
+fi
+
+if [[ "$PORT"a = "a" ]] ; then
+  PORT=$DEFAULT_PORT
+fi
+
+if [[ "$DIGI"a = "a" ]] ; then
+  PROMPT_DEST=$DEST
+else
+  PROMPT_DEST=$DEST" via "$DIGI
+fi
+HELP_TEXT="To exit, type: exit, or just <RETURN>"
+
+#clear
+echo
+echo "+---------------------------------------------------------------+"
+echo "| Starting ChatMUP. "$HELP_TEXT"       |"
+echo "+---------------------------------------------------------------+"
+while [[ 0 ]] ; do
+  echo -n "Text to "$PROMPT_DEST": > "
+  read TEXT
+  if [[ "$TEXT"a == a ]] || [[ "$TEXT" == exit ]]; then
+    break
+  elif [[ "$TEXT" == help ]]; then
+    echo $HELP_TEXT
+  elif [[ "$TEXT" == "your mom" ]]; then
+    echo "Sort yourself out."
+    #Yes, it's an easter egg.
+  else
+    beacon -d "$DESTINATION" -s "$PORT" "$TEXT"
+  fi
+done
+echo
+echo "+-------------------------------------+"
+echo "| ChatMUP terminated by user command. |"
+echo "+-------------------------------------+"
+echo
